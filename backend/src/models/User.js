@@ -5,13 +5,12 @@ const userSchema = new mongoose.Schema(
     clerkId: {
       type: String,
       required: true,
-      unique: true,
-      index: true,
+      // Remove unique: true from here
     },
     email: {
       type: String,
       required: true,
-      index: true,
+      // No index: true here either
     },
     name: {
       type: String,
@@ -56,11 +55,11 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 
-// Indexes
+// All indexes defined explicitly here - cleaner and easier to see!
 userSchema.index({ clerkId: 1 }, { unique: true });
 userSchema.index({ email: 1 });
 

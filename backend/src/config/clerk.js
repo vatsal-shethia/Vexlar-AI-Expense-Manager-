@@ -1,4 +1,3 @@
-const { ClerkExpressRequireAuth } = require("@clerk/express");
 const logger = require("../utils/logger");
 
 const clerkConfig = {
@@ -15,13 +14,7 @@ const validateClerkConfig = () => {
   logger.info("Clerk configuration validated");
 };
 
-// Export middleware
-const requireAuth = ClerkExpressRequireAuth({
-  secretKey: clerkConfig.secretKey,
-});
-
 module.exports = {
   clerkConfig,
   validateClerkConfig,
-  requireAuth,
 };

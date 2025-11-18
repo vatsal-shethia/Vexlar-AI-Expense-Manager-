@@ -1,4 +1,22 @@
-require("dotenv").config();
+// require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+
+//debug logs
+console.log("🔍 Environment Check:");
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("PORT:", process.env.PORT);
+console.log("MONGODB_URI:", process.env.MONGODB_URI ? "✅ Set" : "❌ Missing");
+console.log("REDIS_URL:", process.env.REDIS_URL ? "✅ Set" : "❌ Missing");
+console.log(
+  "CLERK_SECRET_KEY:",
+  process.env.CLERK_SECRET_KEY ? "✅ Set" : "❌ Missing"
+);
+console.log(
+  "GEMINI_API_KEY:",
+  process.env.GEMINI_API_KEY ? "✅ Set" : "❌ Missing"
+);
+console.log("---");
 
 const app = require("./app");
 const connectDB = require("./config/database");
