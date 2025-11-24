@@ -119,7 +119,7 @@ const groupSchema = new mongoose.Schema(
 
 // Indexes
 groupSchema.index({ createdBy: 1 });
-groupSchema.index({ inviteCode: 1 }, { unique: true, sparse: true });
+groupSchema.index({ inviteCode: 1 });
 
 // Default group expense categories
 groupSchema.pre("save", function (next) {
