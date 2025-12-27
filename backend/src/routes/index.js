@@ -288,6 +288,14 @@ router.get("/test/statement-details", async (req, res, next) => {
   }
 });
 //new block ends
+router.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    service: "Vexlar API",
+  });
+});
+
 //Mount route modules
 router.use("/auth", authRoutes);
 router.use("/transactions", transactionRoutes);
