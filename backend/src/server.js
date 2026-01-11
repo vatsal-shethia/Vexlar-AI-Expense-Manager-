@@ -4,10 +4,10 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const app = require("./app");
 const connectDB = require("./config/database");
-const { connectRedis } = require("./config/redis");
 const { initGemini } = require("./config/gemini");
 const { validateClerkConfig } = require("./config/clerk");
 const logger = require("./utils/logger");
+const redis = require("./config/redis");
 
 const PORT = process.env.PORT || 5000;
 
@@ -29,8 +29,8 @@ const startServer = async () => {
     logger.info("Database connected");
 
     // Connect to Redis (non-blocking)
-    await connectRedis();
-    logger.info("Redis connected");
+    await redis.initRedis();
+    logger.info("Redis initialized");
 
     // Initialize Gemini AI
     initGemini();
@@ -46,6 +46,8 @@ const startServer = async () => {
     // Graceful shutdown
     const shutdown = async (signal) => {
       logger.info(`${signal} received, shutting down gracefully`);
+
+      await redis.closeRedis();
 
       server.close(() => {
         logger.info("HTTP server closed");
