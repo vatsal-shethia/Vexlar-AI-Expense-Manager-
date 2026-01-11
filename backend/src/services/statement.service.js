@@ -1,4 +1,5 @@
 const parserService = require("../parsers");
+const insightService = require("./insight.service");
 const groupExpenseDetector = require("./groupExpenseDetector.service");
 const categorizationService = require("./categorization.service");
 const statementRepository = require("../repositories/statement.repository");
@@ -117,6 +118,33 @@ class StatementService {
         transactionsCount: insertedTransactions.length,
         autoDetectionSummary: detectionSummary,
       });
+
+      // Step 12: Trigger insight computation
+      if (statementPeriod && statementPeriod.from) {
+        const month = statementPeriod.from.toISOString().slice(0, 7);
+
+        // Invalidate cache for this month
+        insightService.invalidateInsights(userId, month).catch((err) => {
+          logger.error(
+            { error: err, userId, month },
+            "Failed to invalidate insights cache"
+          );
+        });
+
+        // Optional: Pre-compute insight in background
+        insightService
+          .computePersonalInsight(userId, month)
+          .then((insight) => {
+            const insightRepository = require("../repositories/insight.repository");
+            return insightRepository.upsert(insight);
+          })
+          .catch((err) => {
+            logger.error(
+              { error: err, userId, month },
+              "Failed to pre-compute insight"
+            );
+          });
+      }
 
       logger.info(
         {

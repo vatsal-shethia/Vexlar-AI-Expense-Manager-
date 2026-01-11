@@ -1,6 +1,7 @@
 const Transaction = require("../models/Transaction");
 const merchantMappingService = require("../services/merchantMapping.service");
 const categorizationService = require("../services/categorization.service");
+const insightService = require("../services/insight.service");
 const logger = require("../utils/logger");
 const { ValidationError, NotFoundError } = require("../utils/errors");
 
@@ -129,6 +130,10 @@ class TransactionsController {
         userId // User-specific mapping
       );
 
+      // Invalidate insights cache for this month
+      const month = transaction.date.toISOString().slice(0, 7);
+      await insightService.invalidateInsights(userId, month);
+
       logger.info(
         {
           transactionId: id,
@@ -218,6 +223,20 @@ class TransactionsController {
             error: err.message,
           });
         }
+      }
+
+      // Invalidate insights cache for all affected months
+      const affectedMonths = new Set();
+      for (const update of updates) {
+        const txn = await Transaction.findById(update.transactionId);
+        if (txn) {
+          const month = txn.date.toISOString().slice(0, 7);
+          affectedMonths.add(month);
+        }
+      }
+
+      for (const month of affectedMonths) {
+        await insightService.invalidateInsights(userId, month);
       }
 
       logger.info(
